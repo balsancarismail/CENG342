@@ -1,13 +1,12 @@
 CC=gcc
 CFLAGS=-I.
-SRCS = $(wildcard *.c)
-OBJS = $(SRCS:.c = .o)
 DEPS = hellomake.h
+OBJ = 18050111021.o hellofunc.o
 
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-hellomake: $(OBJS)
+hellomake: $(OBJ)
 	$(CC) -o $@ $^ $(CFLAGS)
 
 clean:
