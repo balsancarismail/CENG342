@@ -1,60 +1,123 @@
-#include "hellomake.h"
+//
+// Created by Asus on 2.04.2023.
+//
+#define MASTER 0
+
+#include <mpi.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
+double **allocate_matrix_2d(int rows, int cols) {
+    double **matrix = (double **) malloc(rows * sizeof(double *));
+    for (int i = 0; i < rows; i++) {
+        matrix[i] = (double *) malloc(cols * sizeof(double));
+    }
+    return matrix;
+}
+
+double *allocate_matrix_1d(int rows, int cols) {
+    double *matrix = (double *) malloc(rows * cols * sizeof(double));
+    return matrix;
+}
+
+void initialize_matrix_2d(double **matrix, int rows, int cols) {
+    srand(time(NULL));  // Seed the random number generator
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            matrix[i][j] = (double) rand() / RAND_MAX;
+        }
+    }
+}
+
+void initialize_matrix_1d(double *matrix, int rows, int cols) {
+    srand(time(NULL));  // Seed the random number generator
+    for (int i = 0; i < rows * cols; i++) {
+        matrix[i] = (double) rand() / RAND_MAX;
+    }
+}
+
+void print_matrix(double *matrix, int rows, int cols) {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            printf("%.2f ", matrix[i * cols + j]);
+        }
+        printf("\n");
+    }
+}
+void free_1d_array(double* arr) {
+    free(arr);
+}
+
+void free_2d_array(double** arr, int rows) {
+    for (int i = 0; i < rows; i++) {
+        free(arr[i]);
+    }
+    free(arr);
+}
+void RowMatrixVectorMultiply(int dim, double *matrix_data, double *vector_data,double *result, char *output_file){
+    FILE *fp;
+    fp = fopen(output_file, "a+");
+    int rank,size;
+    MPI_Comm_rank (MPI_COMM_WORLD, &rank);
+    MPI_Comm_size (MPI_COMM_WORLD, &size);
+    double* localresult = allocate_matrix_1d(dim / size,1);
+    double matrix[dim][dim];  //local matrix
+    double start_time = MPI_Wtime();
+
+    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Scatter(matrix_data, (dim*dim)/size, MPI_DOUBLE, matrix, (dim*dim)/size, MPI_DOUBLE, MASTER, MPI_COMM_WORLD); //Scatter the Matrix
+    MPI_Bcast(vector_data, dim, MPI_DOUBLE, MASTER, MPI_COMM_WORLD);// Broadcast the Vector
+
+    //Calculate the results
+    for (int i = 0;i<(dim/size);i++)
+        for (int j = 0;j<dim;j++)
+            localresult[i]+=vector_data[j]*matrix[i][j];
+
+    MPI_Gather(localresult, (dim)/size, MPI_DOUBLE, result, (dim)/size, MPI_DOUBLE, MASTER, MPI_COMM_WORLD); // Gather the results
+    double end_time = MPI_Wtime();
+
+    free_1d_array(localresult);
+
+    if (rank == MASTER) {
+        //print_matrix(result, dim, 1);
+        fprintf(fp, "Elapsed time is %.3f seconds for parallel mxv with %d processes\n", end_time - start_time, size);
+    }
+}
+
 int main(int argc, char *argv[]) {
-    if (argc != 4) {
-        printf("Usage: %s <matrix_rows> <matrix_cols> <output_filename>\n", argv[0]);
+    int rank, size;
+    MPI_Init(&argc, &argv);
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+    if (argc != 3) {
+        if (rank == MASTER) {
+            fprintf(stderr, "usage: %s <large matrix size> <small matrix size>\n", argv[0]);
+        }
+        MPI_Finalize();
         return 1;
     }
 
-    int matrix_rows = atoi(argv[1]);
-    int matrix_cols = atoi(argv[2]);
-    char *output_filename = argv[3];
+    int dim = atoi(argv[1]);
+    char *output_file = argv[2];
 
-    // Set the seed for the random number generator
-    srand(time(NULL));
+    double **matrix_data = allocate_matrix_2d(dim, dim);
+    double *vector_data = allocate_matrix_1d(dim, 1);
+    double *result = allocate_matrix_1d(dim, 1);
 
-    // Allocate memory for the matrix
-    double **matrix = (double **)malloc(matrix_rows * sizeof(double *));
-    for (int i = 0; i < matrix_rows; i++) {
-        matrix[i] = (double *)calloc(matrix_cols, sizeof(double));
-        for (int j = 0; j < matrix_cols; j++) {
-            // Fill the matrix with random double values between 1.0 and 100.0
-            matrix[i][j] = ((double)rand() / RAND_MAX) * 99.0 + 1.0;
-        }
+    if (rank == MASTER) {
+        initialize_matrix_2d(matrix_data, dim, dim);
+        initialize_matrix_1d(vector_data, dim, 1);
     }
 
-    // Allocate memory for the vector
-    double *vector = (double *)calloc(matrix_cols, sizeof(double));
-    for (int i = 0; i < matrix_cols; i++) {
-        // Fill the vector with random double values between 1.0 and 100.0
-        vector[i] = ((double)rand() / RAND_MAX) * 99.0 + 1.0;
-    }
+    RowMatrixVectorMultiply(dim, (double *) matrix_data, vector_data, result, output_file);
 
-    // Perform matrix-vector multiplication
-    double *result = (double *)calloc(matrix_rows, sizeof(double));
-    for (int i = 0; i < matrix_rows; i++) {
-        for (int j = 0; j < matrix_cols; j++) {
-            result[i] += matrix[i][j] * vector[j];
-        }
-    }
+    MPI_Finalize();
 
-    // Write the result to a file
-    FILE *output_file = fopen(output_filename, "w");
-    for (int i = 0; i < matrix_rows; i++) {
-        fprintf(output_file, "%.2f\n", result[i]);
-    }
-    fclose(output_file);
-
-    // Free memory
-    for (int i = 0; i < matrix_rows; i++) {
-        free(matrix[i]);
-    }
-    free(matrix);
-    free(vector);
-    free(result);
+    free_1d_array(vector_data);
+    free_1d_array(result);
+    free_2d_array(matrix_data, dim);
 
     return 0;
 }
