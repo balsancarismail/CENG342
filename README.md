@@ -1,5 +1,6 @@
 # CENG342
 CENG342 - Makefile task
 # To run it :
-![makefile](https://user-images.githubusercontent.com/89700270/224552105-ce28acde-7ffe-429e-8037-76dc93bf09fb.PNG)
+![MPI](https://user-images.githubusercontent.com/89700270/229376197-f3150128-b28a-4e59-b5a4-f774b5608a01.PNG)
+
 
