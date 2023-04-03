@@ -2,16 +2,16 @@ program: 18050111021.c
 	mpicc -o program 18050111021.c
 
 run_one:
-	OMPI_MCA_btl_vader_single_copy_mechanism=none mpirun -np 1 ./program 1021 output.txt
+	OMPI_MCA_btl_vader_single_copy_mechanism=none mpirun -np 1 ./program 121 output.txt
 
 run_two:
-	OMPI_MCA_btl_vader_single_copy_mechanism=none mpirun -np 2 ./program 1021 output.txt
+	OMPI_MCA_btl_vader_single_copy_mechanism=none mpirun -np 2 ./program 121 output.txt
 
 run_three:
-	OMPI_MCA_btl_vader_single_copy_mechanism=none mpirun -np 3 ./program 1021 output.txt
+	OMPI_MCA_btl_vader_single_copy_mechanism=none mpirun -np 3 ./program 121 output.txt
 
 run_four:
-	OMPI_MCA_btl_vader_single_copy_mechanism=none mpirun -np 4 ./program 1021 output.txt
+	OMPI_MCA_btl_vader_single_copy_mechanism=none mpirun -np 4 ./program 121 output.txt
 
 
 complete:

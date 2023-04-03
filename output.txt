@@ -1,5 +1,28 @@
+Matrix Large
+
 Elapsed time is 0.006 seconds for parallel mxv with 1 processes
+Elapsed time is 0.005 seconds for parallel mxv with 1 processes
+Elapsed time is 0.005 seconds for parallel mxv with 1 processes
+Elapsed time is 0.004 seconds for parallel mxv with 2 processes
 Elapsed time is 0.003 seconds for parallel mxv with 2 processes
-Elapsed time is 0.003 seconds for parallel mxv with 2 processes
+Elapsed time is 0.004 seconds for parallel mxv with 2 processes
 Elapsed time is 0.004 seconds for parallel mxv with 3 processes
+Elapsed time is 0.005 seconds for parallel mxv with 3 processes
+Elapsed time is 0.003 seconds for parallel mxv with 3 processes
 Elapsed time is 0.003 seconds for parallel mxv with 4 processes
+Elapsed time is 0.004 seconds for parallel mxv with 4 processes
+Elapsed time is 0.003 seconds for parallel mxv with 4 processes
+
+Matrix Small
+Elapsed time is 0.000 seconds for parallel mxv with 1 processes
+Elapsed time is 0.000 seconds for parallel mxv with 1 processes
+Elapsed time is 0.000 seconds for parallel mxv with 1 processes
+Elapsed time is 0.000 seconds for parallel mxv with 2 processes
+Elapsed time is 0.000 seconds for parallel mxv with 2 processes
+Elapsed time is 0.000 seconds for parallel mxv with 2 processes
+Elapsed time is 0.000 seconds for parallel mxv with 3 processes
+Elapsed time is 0.000 seconds for parallel mxv with 3 processes
+Elapsed time is 0.001 seconds for parallel mxv with 3 processes
+Elapsed time is 0.000 seconds for parallel mxv with 4 processes
+Elapsed time is 0.000 seconds for parallel mxv with 4 processes
+Elapsed time is 0.000 seconds for parallel mxv with 4 processes
